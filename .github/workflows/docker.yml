@@ -1,5 +1,5 @@
 
-name: Employee Management CI
+name: Employee Management CI/CD
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,5 +25,15 @@ jobs:
       - name: Run Tests
         run: npm test
 
-      - name: Build Docker Image
-        run: docker build -t employee-management .
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB }}
+          password: ${{ secrets.DOCKERLOGIN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ikhlaskhan/employee-management-app:latest
